@@ -74,3 +74,17 @@ function eventoDescargas(parametros, url) {
         console.log('eventoDescargas: ' + actualizarDescargas(parametros, url));
     });
 }
+
+
+function pruebaDescargas() {
+    $('form[name="aumentar-descargas"]').on('submit', function(e) {
+        e.preventDefault();
+        $.post('/index.php?r=torrents%2Faumentardescargas', $(this).serialize(), function (data) {
+            alert(data);
+        });
+    });
+}
+
+function pruebaDescargas2() {
+
+}

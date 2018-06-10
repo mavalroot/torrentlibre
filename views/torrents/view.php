@@ -13,15 +13,15 @@ $this->params['breadcrumbs'][] = ['label' => 'Torrents', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 /* Aumentar descargas al pulsar descargar */
-$url = Url::to(['aumentardescargas']);
-$parametros = 'id=' . $model->id . '&&' . '_csrf=' .
-              Yii::$app->request->getCsrfToken();
-$scripts = <<<EOF
-eventoDescargas("$parametros", "$url");
-EOF;
+// $url = Yii::$app->request->baseUrl . '/torrents/aumentardescargas';
+// $parametros = 'id=' . $model->id . '&&' . '_csrf=' .
+//               Yii::$app->request->getCsrfToken();
+// $scripts = <<<EOF
+// eventoDescargas("$parametros", "$url");
+// EOF;
 /* Fin de aumentar descargas */
 
-$this->registerJs($scripts);
+// $this->registerJs($scripts);
 
 // Registro assets para esta vista
 TorrentsViewAsset::register($this);
@@ -37,16 +37,16 @@ TorrentsViewAsset::register($this);
             [
                 'attribute' => 'imagen',
                 'format' => 'raw',
-                'value' => function($model) {
+                'value' => function ($model) {
                     $img = $model->imagen;
-                    $ruta = yii::getAlias('@r_imgTorrent').'/';
+                    $ruta = yii::getAlias('@r_imgTorrent') . '/';
 
-                    if ((! isset($img)) || (! file_exists($ruta.$img))) {
+                    if ((!isset($img)) || (!file_exists($ruta . $img))) {
                         $img = 'default.png';
                     }
 
-                    return '<img src="'.$ruta.$img.'" />';
-                }
+                    return '<img src="' . $ruta . $img . '" />';
+                },
             ],
             'resumen',
             'licencia.tipo:text:Licencia',
@@ -56,19 +56,25 @@ TorrentsViewAsset::register($this);
             [
                 'attribute' => 'file',
                 'format' => 'raw',
-                'value' => function($model) {
+                'value' => function ($model) {
                     $file = $model->file;
-                    $ruta = yii::getAlias('@r_torrents').'/';
+                    $ruta = yii::getAlias('@r_torrents') . '/';
 
-                    if ((! isset($file)) || (! file_exists($ruta.$file))) {
+                    if ((!isset($file)) || (!file_exists($ruta . $file))) {
                         return 'Archivo torrent no encontrado';
                     }
 
-                    return HTML::a('Descargar', $ruta . $file, [
-                        'class' => 'btn btn-success btn-descargar',
-                    ]);
+                    return Html::beginForm('', 'post', ['name' => 'aumentar-descargas']) .
+                        Html::hiddenInput('id', $model->id) .
+                        Html::hiddenInput('file', $ruta . $file) .
+                        Html::submitButton('Descargar', ['class' => 'btn btn-success btn-descargar']) .
+                        Html::endForm();
+
+                // return HTML::a('Descargar', $ruta . $file, [
+                    //     'class' => 'btn btn-success btn-descargar',
+                    // ]);
                 },
-                'on' => "aumentarDescargas($parametros, $url)",
+                // 'on' => "aumentarDescargas($parametros, $url)",
             ],
             'size:shortSize',
             'magnet',
@@ -93,3 +99,12 @@ TorrentsViewAsset::register($this);
         ]) ?>
     </p>
 </div>
+
+
+<?php
+
+$scripts = <<<'EOF'
+pruebaDescargas();
+EOF;
+
+$this->registerJs($scripts);
